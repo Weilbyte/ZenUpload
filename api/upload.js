@@ -13,7 +13,7 @@ async function handleUnwanted(req, res) {
       return true
     }
 
-    if (!req.headers["content-type"].includes("multipart/form-data;")) {
+    if (req.headers['Content-Type'] === undefined || !req.headers["content-type"].includes("multipart/form-data;")) {
         res.statusCode = 400
         await res.send(
           JSON.stringify({
