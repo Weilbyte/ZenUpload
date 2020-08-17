@@ -1,7 +1,7 @@
 const fs = require('fs');
 const IncomingForm = require('formidable').IncomingForm;
 
-async function handleUnwanted(req, res, data) {
+async function handleUnwanted(req, res) {
     if (req.method !== "POST") {
       res.statusCode = 405
       await res.send(
@@ -24,14 +24,10 @@ async function handleUnwanted(req, res, data) {
         return true
     }
 
-    if (data.files === undefined) {
-        await res.status(400).send(JSON.stringify({
-            success: false, 
-            msg: 'Bad request, form-data is corrupted.'
-        }));
-        return true
-    }
-  
+    return false
+};
+
+async function handleUnwantedData(res, data) {
     if (!data.files["image"]) {
       res.statusCode = 400
       await res.send(
@@ -53,20 +49,23 @@ async function handleUnwanted(req, res, data) {
       )
       return true
     }
-  
-    return false
+
+    return false;
 };
 
 exports.default = async function (req, res) {
+    const unwated = await handleUnwanted(req, res);
+    if (unwated) return;
+
     const data = await new Promise((resolve, reject) => {
         const form = new IncomingForm();
         form.parse(req, (err, fields, files) => {
-          if (err) return resolve(undefined);
+          if (err) return reject(err);
           resolve({ fields, files });
         })
     });
 
-    const unwated = await handleUnwanted(req, res, data);
+    const unwated = await handleUnwantedData(res, data);
     if (unwated) return;
 
     console.log('prep fs read')
