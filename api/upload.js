@@ -1,7 +1,9 @@
 const fs = require('fs');
-const IncomingForm = require('formidable').IncomingForm;
+const os = require('os');
+const path = require('path');
+const Busboy = require('busboy');
 
-async function handleUnwanted(req, res, data) {
+async function handleUnwanted(req, res) {
     if (req.method !== "POST") {
       res.statusCode = 405
       await res.send(
@@ -24,57 +26,47 @@ async function handleUnwanted(req, res, data) {
         return true
     }
 
-    if (data.files === undefined) {
-        await res.status(400).send(JSON.stringify({
-            success: false, 
-            msg: "Unexpected error at form-data parsing."
-        }));
-    }
-
-    if (!data.files["image"]) {
-        res.statusCode = 400
-        await res.send(
-          JSON.stringify({
-            success: false,
-            msg: "Missing 'image' form file.",
-          })
-        )
-        return true
-      }
-    
-      if (!data.files["image"]["type"].startsWith("image/")) {
-        res.statusCode = 400
-        await res.send(
-          JSON.stringify({
-            success: false,
-            msg: "Uploaded file must be image/* type.",
-          })
-        )
-        return true
-      }
-
     return false
 };
 
-exports.default = async function (req, res) {
-    const data = await new Promise((resolve, reject) => {
-        const form = new IncomingForm();
-        form.parse(req, (err, fields, files) => {
-          if (err) {
-              console.log(err);
-              return resolve(undefined);
-          };
-          resolve({ fields, files });
-        })
-    });
+async function checkData(data, res) {
+    res.status(200).send(JSON.stringify({
+        success: true, 
+        data: data
+    }));
+};
 
-    const unwanted = await handleUnwanted(req, res, data);
+exports.default = async function (req, res) {
+    const data = {fields : {}, file: undefined, fileWrite: undefined}; 
+
+    const unwanted = await handleUnwanted(req, res);
     if (unwanted) return;
 
-    console.log('prep fs read')
-    await fs.readFile(data.files.image.path, async (err, content) => {
-        if (err) console.log(err)
-        res.statusCode = 200
-        await res.send(`temp good work lol ${content}`)
+    const busboy = new Busboy({ headers: req.headers });
+    const tmpdir = os.tmpdir();
+
+    busboy.on('field', (fieldname, val) => {
+        data.fields[fieldname] = val;
     });
+
+    busboy.on('file', (fieldname, file, filename) => {
+        if (fieldname === 'image') {
+            const filePath = path.join(tmpdir, filename);
+            data.file = filePath;
+
+            const wStream = fs.createWriteStream(filePath);
+            file.pipe(wStream);
+
+            const promise = new Promise((resolve, reject) => {
+                file.on('end', () => {
+                    wStream.end();
+                });
+                wStream.on('finish', resolve);
+                wStream.on('error', reject);
+            });
+            data.fileWrite = promise;
+        };
+    });
+
+    await checkData(data, res);
 };
