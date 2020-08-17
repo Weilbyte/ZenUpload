@@ -1,4 +1,4 @@
-export const sites = {
+const sites = exports.sites = {
     minecraft: "https://help.minecraft.net/",
     fcc: "https://consumercomplaints.fcc.gov/",
     pornhub: "https://help.pornhub.com/",
@@ -22,7 +22,7 @@ export const sites = {
     crunchyroll: "https://help.crunchyroll.com/",
 };
 
-export function getSite(site) {
+exports.getSize = function(site) {
     if (site in sites) {
       return sites[site];
     } else {
