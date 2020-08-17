@@ -12,27 +12,16 @@ async function handleUnwanted(req, res, data) {
       )
       return true
     }
-  
-    if (!req.query["filename"]) {
-      res.statusCode = 400
-      await res.send(
-        JSON.stringify({
-          success: false,
-          msg: "Missing 'filename' parameter.",
-        })
-      )
-      return true
-    }
-  
+
     if (!req.headers["content-type"].includes("multipart/form-data;")) {
-      res.statusCode = 400
-      await res.send(
-        JSON.stringify({
-          success: false,
-          msg: "Unsupported Content-Type.",
-        })
-      )
-      return true
+        res.statusCode = 400
+        await res.send(
+          JSON.stringify({
+            success: false,
+            msg: "Unsupported Content-Type.",
+          })
+        )
+        return true
     }
   
     if (!data.files["image"]) {
@@ -71,6 +60,7 @@ exports.default = async function (req, res) {
     const unwated = await handleUnwanted(req, res, data);
     if (unwated) return;
 
+    console.log('prep fs read')
     await fs.readFile(data.files.image.path, async (err, content) => {
         if (err) console.log(err)
         res.statusCode = 200
