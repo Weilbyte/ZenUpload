@@ -23,6 +23,14 @@ async function handleUnwanted(req, res, data) {
         )
         return true
     }
+
+    if (data.files === undefined) {
+        await res.status(400).send(JSON.stringify({
+            success: false, 
+            msg: 'Bad request, form-data is corrupted.'
+        }));
+        return true
+    }
   
     if (!data.files["image"]) {
       res.statusCode = 400
@@ -53,10 +61,11 @@ exports.default = async function (req, res) {
     const data = await new Promise((resolve, reject) => {
         const form = new IncomingForm();
         form.parse(req, (err, fields, files) => {
-          if (err) return resolve(undefined)
-          resolve({ fields, files })
+          if (err) return resolve(undefined);
+          resolve({ fields, files });
         })
     });
+
     const unwated = await handleUnwanted(req, res, data);
     if (unwated) return;
 
