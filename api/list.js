@@ -1,11 +1,10 @@
 const sites = require('../sites').sites;
 
-function handleUnwanted(req, res) {
+async function handleUnwanted(req, res) {
     if (req.method !== "GET") {
-        res.status(405).send(
-        JSON.stringify({
-          success: false,
-          msg: "Unsupported method.",
+        await res.status(405).send(JSON.stringify({
+            success: false,
+            msg: "Unsupported method.",
         })
       );
       return true;
@@ -14,11 +13,11 @@ function handleUnwanted(req, res) {
     return false;
 };
 
-exports.default = function (req, res) {
-    const unwanted = handleUnwanted(req, res);
+exports.default = async function (req, res) {
+    const unwanted = await handleUnwanted(req, res);
     if (unwanted) return;
 
-    res.status(200).send(JSON.stringify({
+    await res.status(200).send(JSON.stringify({
         success: true, 
         sites: sites
     }));
