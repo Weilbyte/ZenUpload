@@ -64,7 +64,7 @@ exports.default = async function (req, res) {
     const data = await new Promise((resolve, reject) => {
         const form = new IncomingForm();
         form.parse(req, (err, fields, files) => {
-          if (err) return reject(err)
+          if (err) return resolve(undefined)
           resolve({ fields, files })
         })
     });
@@ -73,7 +73,6 @@ exports.default = async function (req, res) {
 
     await fs.readFile(data.files.image.path, async (err, content) => {
         if (err) console.log(err)
-       
         res.statusCode = 200
         await res.send(`temp good work lol ${content}`)
     });
