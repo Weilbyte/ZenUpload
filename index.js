@@ -1,5 +1,3 @@
-const sites = require('./sites');
-
 const list = require('./api/list').default;
 const upload = require('./api/upload').default;
 
