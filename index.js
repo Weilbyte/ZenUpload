@@ -1,7 +1,7 @@
 const sites = require('./sites');
 
-const list = require('./api/list');
-const upload = require('./api/upload');
+const list = require('./api/list').default;
+const upload = require('./api/upload').default;
 
 exports.requestEntry = (req, res) => {
     switch (req.path) {
