@@ -10,7 +10,7 @@ const upload = require('./api/upload');
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.entry = (req, res) => {
+exports.requestEntry = (req, res) => {
     switch (req.path) {
         case '/upload':
             return upload(req, res);
