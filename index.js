@@ -1,3 +1,4 @@
+const debug = require('@google-cloud/debug-agent').start({ allowExpressions: true });
 const list = require('./api/list').default;
 const upload = require('./api/upload').default;
 

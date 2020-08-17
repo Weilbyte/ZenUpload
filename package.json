@@ -4,6 +4,7 @@
   "author": "Weilbyte <git@weilbyte.dev>",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/debug-agent": "^5.1.2",
     "formidable": "^1.2.2"
   }
 }
