@@ -54,8 +54,8 @@ async function handleUnwantedData(res, data) {
 };
 
 exports.default = async function (req, res) {
-    const unwated = await handleUnwanted(req, res);
-    if (unwated) return;
+    const unwanted = await handleUnwanted(req, res);
+    if (unwanted) return;
 
     const data = await new Promise((resolve, reject) => {
         const form = new IncomingForm();
@@ -65,8 +65,8 @@ exports.default = async function (req, res) {
         })
     });
 
-    const unwated = await handleUnwantedData(res, data);
-    if (unwated) return;
+    unwanted = await handleUnwantedData(res, data);
+    if (unwanted) return;
 
     console.log('prep fs read')
     await fs.readFile(data.files.image.path, async (err, content) => {
