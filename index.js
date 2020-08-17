@@ -2,6 +2,8 @@ const list = require('./api/list').default;
 const upload = require('./api/upload').default;
 
 exports.requestEntry = async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    
     switch (req.path) {
         case '/upload':
             await upload(req, res);
